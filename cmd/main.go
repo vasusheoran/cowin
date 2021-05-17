@@ -8,6 +8,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -76,11 +77,12 @@ func schedule(logger log.Logger, inputFlag *contracts.InputFlags) error {
 			break
 		case "2":
 			vaccine = constants.COVISHIELD
+			break
 		default:
 			vaccine = constants.COVAX
 		}
 
-		level.Info(logger).Log("msg", "Adding filter", "districts", districts, "doseType", doseType, "age", age, "vaccine", vaccine)
+		level.Info(logger).Log("msg", "Adding filter", "districts", fmt.Sprint(districts), "doseType", doseType, "age", age, "vaccine", vaccine)
 		service.AddFilter(districts, doseType, age, vaccine)
 
 	}
