@@ -19,6 +19,7 @@ func TestCowinService_GetCalendarByDistrict(t *testing.T) {
 	testCases := []struct {
 		name     string
 		client   func() *mocks.HTTPClient
+		notify   func() *mocks.Notify
 		district int
 		date     time.Time
 		expected error
@@ -30,6 +31,12 @@ func TestCowinService_GetCalendarByDistrict(t *testing.T) {
 				mockClient.On("Do", mock.Anything).Return(nil, err2.FailedToMakeHTTPRequest)
 				return mockClient
 			},
+			notify: func() *mocks.Notify {
+				mockNotify := &mocks.Notify{}
+				mockNotify.On("Add", mock.Anything).Return()
+				mockNotify.On("Notify", mock.Anything, mock.Anything).Return()
+				return mockNotify
+			},
 			district: constants.SWD,
 			date:     time.Now(),
 			expected: err2.FailedToMakeHTTPRequest,
@@ -38,7 +45,7 @@ func TestCowinService_GetCalendarByDistrict(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			cs := New(logger, testCase.client())
+			cs := New(logger, testCase.notify(), testCase.client())
 			err := cs.GetCalendarByDistrict(testCase.district, testCase.date)
 
 			if testCase.expected != nil {

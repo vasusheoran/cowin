@@ -1,5 +1,7 @@
 package constants
 
+var MinimumAlertVal = 5
+
 const (
 	ProductionServer   = "https://cdn-api.co-vin.in/api"
 	CalendarByDistrict = "{{ .BaseURI }}/v2/appointment/sessions/calendarByDistrict?district_id={{ .DistrictID }}&date={{ .Date }}"

@@ -86,7 +86,7 @@ func schedule(logger log.Logger, inputFlag *contracts.InputFlags) error {
 			vaccine = constants.COVAX
 		}
 
-		level.Info(logger).Log("msg", "Adding filter", "districts", fmt.Sprint(districts), "doseType", doseType, "age", age, "vaccine", vaccine)
+		level.Info(logger).Log("msg", "Adding filter", "districts", fmt.Sprint(districts), "doseType", doseType, "age", age, "vaccine", vaccine, "MinimumAlertVal", constants.MinimumAlertVal)
 		service.AddFilter(districts, pincodes, doseType, age, vaccine)
 
 	}
@@ -116,11 +116,12 @@ func parseFlag(logger log.Logger) (*contracts.InputFlags, error) {
 	var inputFlags contracts.InputFlags
 
 	flags := flag.NewFlagSet("cowin", flag.ExitOnError)
-	flags.StringVar(&inputFlags.Districts, "districts", "", "<district>,<district>,... eg: 143,150 ")
-	flags.Var(&inputFlags.Filters, "filter", "<dose type>,<minimum age>,<vaccine> eg: 1,18,1 [Dose Type: 1st dose (1), 2nd dose (2)] [Vaccine: COVAXIN (1), COVISHIELD (2)]")
+	flags.StringVar(&inputFlags.Districts, "districts", "", "<district>,<district>,... eg: 143,150")
+	flags.StringVar(&inputFlags.Pincodes, "pincodes", "", "<pincode>,<pincode>,... eg: 110046,110047")
+	flags.Var(&inputFlags.Filters, "filter", "<dose type>,<minimum age>,<vaccine> eg: 1,18,1 [Dose Type: 1st dose (1), 2nd dose (2)] [Vaccine: COVAXIN (1), COVISHIELD (2)] [Required]")
 	flags.StringVar(&inputFlags.Interval, "interval", "5m", "Interval [1s/2m/3h]")
 	flags.BoolVar(&inputFlags.Help, "help", false, "Set to true for printing usage")
-	flags.StringVar(&inputFlags.Pincodes, "pincodes", "", "<pincode>,<pincode>,... eg: 110046,110047 ")
+	flags.IntVar(&inputFlags.MinAlertVal, "min-alert-value", 5, "Minimum doses required for sending alert message.")
 
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return nil, err
@@ -130,6 +131,8 @@ func parseFlag(logger log.Logger) (*contracts.InputFlags, error) {
 		flags.PrintDefaults()
 		os.Exit(1)
 	}
+
+	constants.MinimumAlertVal = inputFlags.MinAlertVal
 
 	return &inputFlags, nil
 }

@@ -120,6 +120,13 @@ func (ns *notifyService) Notify(centers []contracts.Center, district int) {
 }
 
 func (ns *notifyService) sendAlert(filterResponse contracts.FiterResponse) {
+	if filterResponse.Session.AvailableCapacityDose2 < constants.MinimumAlertVal {
+		return
+	}
+	if filterResponse.Session.AvailableCapacityDose1 < constants.MinimumAlertVal {
+		return
+	}
+
 	title := fmt.Sprintf(constants.TitleTemplate, filterResponse.Pin, filterResponse.Filter.Age, filterResponse.Name)
 	responseBody := fmt.Sprintf(constants.SubtitleTemplate,
 		filterResponse.Address,
