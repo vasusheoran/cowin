@@ -32,9 +32,11 @@ func ParseTemplateString(templateString string, placeholders map[string]interfac
 	return value, nil
 }
 
-func MakeDirectoryIfNotExists(path string) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return os.Mkdir(path, os.ModeDir|0755)
+func MakeDirectoryIfNotExists(paths ...string) error {
+	for _, path := range paths {
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			return os.Mkdir(path, os.ModeDir|0755)
+		}
 	}
 	return nil
 }

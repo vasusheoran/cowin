@@ -2,7 +2,7 @@ package contracts
 
 type Filter struct {
 	ID       string `json:"id,omitempty"`
-	District int    `json:"district,omitempty"`
+	Location int    `json:"location,omitempty"`
 	DoseType int    `json:"dose_type,omitempty"`
 	Age      int    `json:"age,omitempty"`
 	Vaccine  string `json:"vaccine,omitempty"`

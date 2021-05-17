@@ -22,7 +22,7 @@ func TestNotifyService_Load(t *testing.T) {
 			name: "Success",
 			add: contracts.Filter{
 				ID:       "testid",
-				District: 150,
+				Location: 150,
 				DoseType: 1,
 				Age:      46,
 				Vaccine:  constants.COVAX,

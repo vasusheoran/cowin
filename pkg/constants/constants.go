@@ -3,17 +3,21 @@ package constants
 const (
 	ProductionServer   = "https://cdn-api.co-vin.in/api"
 	CalendarByDistrict = "{{ .BaseURI }}/v2/appointment/sessions/calendarByDistrict?district_id={{ .DistrictID }}&date={{ .Date }}"
+	CalendarByPincode  = "{{ .BaseURI }}/v2/appointment/sessions/calendarByPin?pincode={{ .Pincode }}&date={{ .Date }}"
 	Layout             = "02-01-2006"
 	DistrictDirPath    = "./output/districts"
+	PincodeDirPath     = "./output/pincodes"
+	FilePath           = "%s/%s.json"
 	AlertsDirPath      = "./output/alerts"
-	DistrictFilePath   = "%s/%s.json"
 	AlertsFilePath     = "%s/%s.json"
-	DistrictFileLayout = "02-01-2006T15:04"
+	TitleTemplate      = "[%d] [%d+] %s"
+	SubtitleTemplate   = "%s, Dose1: %d, Dose2: %d, %s"
 )
 
 const (
 	KeyBaseURI           = "BaseURI"
 	KeyDistrictID        = "DistrictID"
+	KeyPincode           = "Pincode"
 	KeyDate              = "Date"
 	UserAgentHeaderyKey  = "User-Agent"
 	UserAgentHeaderValue = "Mozilla/5.0"

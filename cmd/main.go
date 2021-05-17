@@ -52,6 +52,10 @@ func schedule(logger log.Logger, inputFlag *contracts.InputFlags) error {
 	if err != nil {
 		return err
 	}
+	pincodes, err := getDistricts(inputFlag.Pincodes)
+	if err != nil {
+		return err
+	}
 
 	for _, val := range inputFlag.Filters {
 		filter := strings.Split(val, ",")
@@ -83,7 +87,7 @@ func schedule(logger log.Logger, inputFlag *contracts.InputFlags) error {
 		}
 
 		level.Info(logger).Log("msg", "Adding filter", "districts", fmt.Sprint(districts), "doseType", doseType, "age", age, "vaccine", vaccine)
-		service.AddFilter(districts, doseType, age, vaccine)
+		service.AddFilter(districts, pincodes, doseType, age, vaccine)
 
 	}
 	service.Schedule(inputFlag.Interval)
@@ -91,6 +95,9 @@ func schedule(logger log.Logger, inputFlag *contracts.InputFlags) error {
 }
 
 func getDistricts(districts string) ([]int, error) {
+	if len(districts) == 0 {
+		return []int{}, nil
+	}
 	a := strings.Split(districts, ",")
 	b := []int{}
 	for _, v := range a {
@@ -113,6 +120,7 @@ func parseFlag(logger log.Logger) (*contracts.InputFlags, error) {
 	flags.Var(&inputFlags.Filters, "filter", "<dose type>,<minimum age>,<vaccine> eg: 1,18,1 [Dose Type: 1st dose (1), 2nd dose (2)] [Vaccine: COVAXIN (1), COVISHIELD (2)]")
 	flags.StringVar(&inputFlags.Interval, "interval", "5m", "Interval [1s/2m/3h]")
 	flags.BoolVar(&inputFlags.Help, "help", false, "Set to true for printing usage")
+	flags.StringVar(&inputFlags.Pincodes, "pincodes", "", "<pincode>,<pincode>,... eg: 110046,110047 ")
 
 	if err := flags.Parse(os.Args[1:]); err != nil {
 		return nil, err

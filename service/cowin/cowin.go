@@ -25,6 +25,7 @@ type cowinService struct {
 	client    api.HTTPClient
 	notify    api.Notify
 	districts map[int]bool
+	pincodes  map[int]bool
 	cronJobs  []*cron.Cron
 }
 
@@ -34,23 +35,38 @@ func New(logger log.Logger, notify api.Notify, client api.HTTPClient) api.Cowin 
 		client:    client,
 		notify:    notify,
 		districts: map[int]bool{},
+		pincodes:  map[int]bool{},
 		cronJobs:  []*cron.Cron{},
 	}
 }
 
-func (cs *cowinService) AddFilter(districts []int, doseType, age int, vaccine string) {
+func (cs *cowinService) AddFilter(districts, pincodes []int, doseType, age int, vaccine string) {
 	for _, district := range districts {
 		uid := uuid.New().String()
 
 		cs.notify.Add(contracts.Filter{
 			ID:       uid,
-			District: district,
+			Location: district,
 			DoseType: doseType,
 			Age:      age,
 			Vaccine:  vaccine,
 		})
 
 		cs.districts[district] = false
+	}
+
+	for _, pincode := range pincodes {
+		uid := uuid.New().String()
+
+		cs.notify.Add(contracts.Filter{
+			ID:       uid,
+			Location: pincode,
+			DoseType: doseType,
+			Age:      age,
+			Vaccine:  vaccine,
+		})
+
+		cs.pincodes[pincode] = false
 	}
 }
 
@@ -69,7 +85,7 @@ func (cs *cowinService) Schedule(cronInterval string) {
 	level.Debug(cs.logger).Log("msg", "Creating new cron.")
 	cronJob = cron.New()
 
-	utils.MakeDirectoryIfNotExists(constants.DistrictDirPath)
+	utils.MakeDirectoryIfNotExists(constants.DistrictDirPath, constants.PincodeDirPath)
 
 	for key, _ := range cs.districts {
 		district := key
@@ -82,6 +98,19 @@ func (cs *cowinService) Schedule(cronInterval string) {
 
 		// Add the cron job to the list
 		cs.districts[district] = true
+	}
+
+	for key, _ := range cs.pincodes {
+		pincode := key
+
+		getCalendarByDistrictCron := fmt.Sprintf(constants.CronJob, cronInterval)
+		level.Info(cs.logger).Log("Info", "Parsed cron URL", "GetCalendarByPinCron", getCalendarByDistrictCron, "pincode", pincode)
+		cronJob.AddFunc(getCalendarByDistrictCron, func() {
+			cs.GetCalendarByPincode(pincode, time.Now())
+		})
+
+		// Add the cron job to the list
+		cs.districts[pincode] = true
 	}
 
 	cronJob.Start()
@@ -105,7 +134,7 @@ func (cs *cowinService) GetCalendarByDistrict(district int, date time.Time) erro
 		return err
 	}
 
-	path := fmt.Sprintf(constants.DistrictFilePath, constants.DistrictDirPath, strconv.Itoa(district))
+	path := fmt.Sprintf(constants.FilePath, constants.DistrictDirPath, strconv.Itoa(district))
 	if err := utils.Save(path, res); err != nil {
 		level.Error(cs.logger).Log("err", err)
 		return err
@@ -113,6 +142,36 @@ func (cs *cowinService) GetCalendarByDistrict(district int, date time.Time) erro
 
 	level.Info(cs.logger).Log("msg", "Successfully updated data. Sending alerts if any ...", "district", district)
 	cs.notify.Notify(res.Centers, district)
+
+	return nil
+}
+
+func (cs *cowinService) GetCalendarByPincode(pincode int, date time.Time) error {
+	placeholders := map[string]interface{}{
+		constants.KeyBaseURI: constants.ProductionServer,
+		constants.KeyPincode: pincode,
+		constants.KeyDate:    date.Format(constants.Layout),
+	}
+
+	uri, err := utils.ParseTemplateString(constants.CalendarByPincode, placeholders)
+	if err != nil {
+		level.Error(cs.logger).Log("msg", "failed to parse template string url")
+		return err
+	}
+
+	res, err := cs.invokeAPI(uri)
+	if err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf(constants.FilePath, constants.PincodeDirPath, strconv.Itoa(pincode))
+	if err := utils.Save(path, res); err != nil {
+		level.Error(cs.logger).Log("err", err)
+		return err
+	}
+
+	level.Info(cs.logger).Log("msg", "Successfully updated data. Sending alerts if any ...", "pincode", pincode)
+	cs.notify.Notify(res.Centers, pincode)
 
 	return nil
 }

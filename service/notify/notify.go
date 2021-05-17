@@ -33,12 +33,12 @@ func New(logger log.Logger) api.Notify {
 }
 
 func (ns *notifyService) Add(filter contracts.Filter) error {
-	val, _ := ns.filterMap[filter.District]
+	val, _ := ns.filterMap[filter.Location]
 	if val == nil {
-		ns.filterMap[filter.District] = contracts.Notify{}
+		ns.filterMap[filter.Location] = contracts.Notify{}
 	}
 
-	ns.filterMap[filter.District][filter.ID] = filter
+	ns.filterMap[filter.Location][filter.ID] = filter
 	return nil
 }
 
@@ -86,7 +86,7 @@ func (ns *notifyService) filterAndNotify() error {
 			continue
 		}
 
-		path := fmt.Sprintf(constants.DistrictFilePath, constants.DistrictDirPath, strconv.Itoa(district))
+		path := fmt.Sprintf(constants.FilePath, constants.DistrictDirPath, strconv.Itoa(district))
 		err = utils.Load(path, &data)
 		if err != nil {
 			level.Error(ns.logger).Log("msg", "Unable to read data", "file", f)
@@ -120,8 +120,12 @@ func (ns *notifyService) Notify(centers []contracts.Center, district int) {
 }
 
 func (ns *notifyService) sendAlert(filterResponse contracts.FiterResponse) {
-	title := fmt.Sprintf("%s for %d+, Pin: %d", filterResponse.Name, filterResponse.Filter.Age, filterResponse.Pin)
-	responseBody := fmt.Sprintf("%s,\n1st: %d, 2nd: %d, %d", filterResponse.Address, filterResponse.Session.AvailableCapacityDose1, filterResponse.Session.AvailableCapacityDose2, filterResponse.CenterID)
+	title := fmt.Sprintf(constants.TitleTemplate, filterResponse.Pin, filterResponse.Filter.Age, filterResponse.Name)
+	responseBody := fmt.Sprintf(constants.SubtitleTemplate,
+		filterResponse.Address,
+		filterResponse.Session.AvailableCapacityDose1,
+		filterResponse.Session.AvailableCapacityDose2,
+		filterResponse.Session.Date)
 
 	level.Info(ns.logger).Log("msg", "Valid session found", "title", title, "responseBody", responseBody)
 	err := beeep.Alert(title, responseBody, "")
