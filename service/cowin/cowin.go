@@ -198,7 +198,7 @@ func (cs *cowinService) invokeAPI(uri string) (*contracts.GetCalendarByDistrictR
 			return nil, err
 		}
 		responseMessage := string(respBytes)
-		level.Error(cs.logger).Log("response", responseMessage, "status", resp.StatusCode)
+		level.Error(cs.logger).Log("response", responseMessage, "status", resp.StatusCode, "url", uri)
 		return nil, err2.FailedToMakeHTTPRequest
 	}
 
