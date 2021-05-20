@@ -1,5 +1,9 @@
 package constants
 
+import (
+	"path/filepath"
+)
+
 var MinimumAlertVal = 5
 
 const (
@@ -7,13 +11,15 @@ const (
 	CalendarByDistrict = "{{ .BaseURI }}/v2/appointment/sessions/calendarByDistrict?district_id={{ .DistrictID }}&date={{ .Date }}"
 	CalendarByPincode  = "{{ .BaseURI }}/v2/appointment/sessions/calendarByPin?pincode={{ .Pincode }}&date={{ .Date }}"
 	Layout             = "02-01-2006"
-	DistrictDirPath    = "./output/districts"
-	PincodeDirPath     = "./output/pincodes"
-	FilePath           = "%s/%s.json"
-	AlertsDirPath      = "./output/alerts"
-	AlertsFilePath     = "%s/%s.json"
 	TitleTemplate      = "[%d] [%d+] %s"
 	SubtitleTemplate   = "%s, Dose1: %d, Dose2: %d, %s"
+)
+
+var (
+	DistrictDirPath = filepath.Join("output", "districts")
+	PincodeDirPath  = filepath.Join("output", "pincodes")
+	AlertsDirPath   = filepath.Join("output", "alerts")
+	FilePath        = filepath.Join("%s", "%s.json")
 )
 
 const (

@@ -19,21 +19,22 @@ Usage of cowin:
         Set to true for printing usage
 ```
 
-## Build ##
-`go build -o cowin cmd/main.go`
-
 ## Run ##
-Using go:
-* `go run cmd/main.go --pincodes 110046,110088 --filter 1,18,1 --filter 1,18,2` 
-* `go run cmd/main.go --districts 150,143 --filter 1,18,1 --filter 1,18,2` 
-* `go run cmd/main.go --pincodes 110046,110088 --districts 150,143 --filter 1,18,1 --filter 1,18,2` 
-* `go run cmd/main.go --pincodes 110046,110088 --districts 150,143 --filter 1,18,1 --filter 1,18,2 --interval 10m  --min-alert-value 5` 
+`go run cmd/main.go --pincodes 110046,110088 --filter 1,18,1 --filter 1,18,2` 
+## Build and Run ##
+#### linux / macOS ####
+* `go build -o cowin cmd/main.go`
+* `./cowin --pincodes 110046,110088 --filter 1,18,1 --filter 1,18,2`
+#### Windows ####
+* `go build -o cowin.exe cmd/main.go`
+* `cowin.exe --pincodes 110046,110088 --filter 1,18,1 --filter 1,18,2` 
 
-Using executable:
-* `./cowin --pincodes 110046,110088 --filter 1,18,1 --filter 1,18,2` 
-* `./cowin --districts 150,143 --filter 1,18,1 --filter 1,18,2` 
-* `./cowin --pincodes 110046,110088 --districts 150,143 --filter 1,18,1 --filter 1,18,2` 
-* `./cowin --pincodes 110046,110088 --districts 150,143 --filter 1,18,1 --filter 1,18,2 --interval 10m  --min-alert-value 5` 
+##### Examples #####
+* `go run cmd/main.go --pincodes 110046,110088 --filter 1,18,1 --filter 1,18,2`
+* `go run cmd/main.go --districts 150,143 --filter 1,18,1 --filter 1,18,2`
+* `go run cmd/main.go --pincodes 110046,110088 --districts 150,143 --filter 1,18,2`
+* `go run cmd/main.go --districts 150,143 --filter 1,18,1 --interval 10m --min-alert-value 5`
+
 
 ## Install Latest Go ##
 https://golang.org/doc/install
