@@ -7,9 +7,9 @@ import (
 var MinimumAlertVal = 5
 
 const (
-	ProductionServer   = "https://cdn-api.co-vin.in/api"
-	CalendarByDistrict = "{{ .BaseURI }}/v2/appointment/sessions/calendarByDistrict?district_id={{ .DistrictID }}&date={{ .Date }}"
-	CalendarByPincode  = "{{ .BaseURI }}/v2/appointment/sessions/calendarByPin?pincode={{ .Pincode }}&date={{ .Date }}"
+	ProductionServer   = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public"
+	CalendarByDistrict = "{{ .BaseURI }}/calendarByDistrict?district_id={{ .DistrictID }}&date={{ .Date }}"
+	CalendarByPincode  = "{{ .BaseURI }}/calendarByPin?pincode={{ .Pincode }}&date={{ .Date }}"
 	Layout             = "02-01-2006"
 	TitleTemplate      = "[%d] [%d+] %s"
 	SubtitleTemplate   = "%s, Dose1: %d, Dose2: %d, %s"
